@@ -18,7 +18,7 @@
     (throw (js/Error. "Websocket is not available!"))))
 
 (defn make-websocket! [url receive-handler]
-  (println "attempting to connect websocket")
+  (println "Attempting to connect websocket")
   (if-let [chan (js/WebSocket. url)]
     (do
       (set! (.-onmessage chan) (receive-transit-msg! receive-handler))
