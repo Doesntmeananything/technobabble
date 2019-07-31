@@ -59,7 +59,7 @@
       :on-change   #(reset! value (-> % .-target .-value))
       :on-key-down #(when (= (.-keyCode %) 13)
                       (ws/send-transit-msg!
-                       {:message @value})
+                       {:message @value :user (:user @app-state)})
                       (reset! value nil))}]))
 
 (defn sidebar []
@@ -74,7 +74,7 @@
    [message-list]
    [message-input]
    [:div {:class "header"}
-    [:h3 "core.async chat room"]]
+    [:h3 "chat room"]]
    [sidebar]])
 
 (defn app-container
@@ -107,9 +107,9 @@
 (defn home-page []
   [app-container])
 
-(defn update-messages! [{:message [message] :user [user]}]
+(defn update-messages! [{:keys [message user]}]
   (swap! messages #(vec (take 100 (conj % message))))
-  (swap! users conj :user))
+  (swap! users assoc :active-user user))
 
 (def pages
   {:home #'home-page})
