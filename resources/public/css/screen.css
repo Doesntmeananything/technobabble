@@ -1,0 +1,102 @@
+html,
+body {
+	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+@font-face {
+  font-family: 'Material Icons';
+  font-style: normal;
+  font-weight: 400;
+  src: url(/assets/material-icons/iconfont/MaterialIcons-Regular.eot); /* For IE6-8 */
+  src: local('Material Icons'),
+       local('MaterialIcons-Regular'),
+       url(/assets/material-icons/iconfont/MaterialIcons-Regular.woff2) format('woff2'),
+       url(/assets/material-icons/iconfont/MaterialIcons-Regular.woff) format('woff'),
+       url(/assets/material-icons/iconfont/MaterialIcons-Regular.ttf) format('truetype');
+}
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;  /* Preferred icon size */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Support for all WebKit browsers. */
+  -webkit-font-smoothing: antialiased;
+  /* Support for Safari and Chrome. */
+  text-rendering: optimizeLegibility;
+  /* Support for Firefox. */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+section {
+  padding: none;
+}
+
+li {
+  list-style: none;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+.chat-view {
+	display: grid;
+		width: 100vw;
+		height: 100vh;
+		grid-template-rows: 0px 1fr 50px;
+		grid-template-columns: 200px 1fr;
+		grid-template-areas: "header header"
+				     "sidebar message-list"
+				     "text-input text-input";
+}
+
+.header {
+    grid-area: header;
+    background-color: grey;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: whitesmoke;
+    max-height: calc(100vh-200px);
+    overflow-y: scroll;
+}
+
+.message-list {
+    grid-area: message-list;
+    background-color: white;
+    max-height: calc(100vh-200px);
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.text-input {
+    grid-area: text-input;
+    background-color: whitesmoke;
+    width: 100%;
+}
+
+.login-container {
+    display: grid;
+    width: 100vw;
+    height: 100vh;
+    grid-template-rows: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr; 
+    grid-template-areas: ". . ."
+                         ". login ."
+                         ". . .";
+}
+
+.login {
+    grid-area: login;
+    align-self: center;
+    justify-self: center;
+}
