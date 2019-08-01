@@ -7,74 +7,122 @@
    [goog.history.EventType :as HistoryEventType]
    [technobabble.ajax :as ajax]
    [technobabble.events]
-   [technobabble.websockets :as ws]
    [reitit.core :as reitit]
-   [clojure.string :as string])
+   [clojure.string :as string]
+   [chord.client :refer [ws-ch]]
+   [cljs.core.async :as async :include-macros true])
   (:import goog.History))
+
+(goog-define ws-url "ws://localhost:3000/ws")
 
 (defonce app-state (r/atom {:text "Default text"
                             :active-panel :login
                             :user "Default user"}))
 
 (defonce users (r/atom {}))
-(defonce messages (r/atom []))
+(defonce msg-list (r/atom []))
+
+(defonce send-chan (async/chan))
+
+(defn send-msg
+  [msg]
+  (async/put! send-chan msg))
+
+(defn send-msgs
+  [svr-chan]
+  (async/go-loop []
+    (when-let [msg (async/<! send-chan)]
+      (async/>! svr-chan msg)
+      (recur))))
+
+(defn receive-msgs
+  [svr-chan]
+  (async/go-loop []
+    (if-let [new-msg (:message (async/<! svr-chan))]
+      (do
+        (case (:m-type new-msg)
+          :init-users (reset! users (:msg new-msg))
+          :chat (swap! msg-list conj (dissoc new-msg :m-type))
+          :new-user (swap! users merge (:msg new-msg))
+          :user-left (swap! users dissoc (:msg new-msg)))
+        (recur))
+      (println "Websocket closed"))))
+
+(defn setup-websockets! []
+  (async/go
+    (let [{:keys [ws-channel error]} (async/<! (ws-ch ws-url))]
+      (if error
+        (println "Something went wrong with the websocket")
+        (do
+          (send-msg {:m-type :new-user
+                     :msg (:user @app-state)})
+          (send-msgs ws-channel)
+          (receive-msgs ws-channel))))))
+
+(defn chat-input []
+  (let [v (r/atom nil)]
+    (fn []
+      [:div {:class "chat-input"}
+       [:form
+        {:on-submit (fn [x]
+                      (.preventDefault x)
+                      (when-let [msg @v] (send-msg {:msg msg
+                                                    :user (:user @app-state)
+                                                    :m-type :chat}))
+                      (reset! v nil))}
+        [:div {:class "chat-input-form"}
+         [:input {:type "text"
+                  :class "chat-input-field"
+                  :value @v
+                  :placeholder "Type a message"
+                  :on-change #(reset! v (-> % .-target .-value))}]
+         [:span {:class "chat-input-span"}]
+         [:br]]]])))
+
+(defn chat-history []
+  (r/create-class
+   {:render (fn []
+              [:div {:class "chat-history"}
+               (for [m @msg-list]
+                 ^{:key (:id m)} [:p (str (:user m) ": " (:msg m))])])
+    :component-did-update (fn [this]
+                            (let [node (r/dom-node this)]
+                              (set! (.-scrollTop node) (.-scrollHeight node))))}))
 
 (defn login-view []
-  (let [value (r/atom nil)]
+  (let [v (r/atom nil)]
     (fn []
       [:div {:class "login-container"}
-       [:div {:class "login"}
-        [:form
-         {:on-submit (fn [x]
-                       (.preventDefault x)
-                       (swap! app-state assoc :user @value)
-                       (swap! app-state assoc :active-panel :chat)
-                       (ws/send-transit-msg!
-                        {:user @value}))}
+       [:form
+        {:on-submit (fn [x]
+                      (.preventDefault x)
+                      (swap! app-state assoc :user @v)
+                      (swap! app-state assoc :active-panel :chat)
+                      (setup-websockets!))}
+        [:div {:class "login-input-container"}
          [:input {:type "text"
-                  :class "input is-primary"
-                  :value @value
-                  :placeholder "Pick a username"
-                  :on-change #(reset! value (-> % .-target .-value))}]
-         [:br]
-         [:button {:type "submit"
-                   :class "button is-primary"} "Start chatting"]]]])))
-
-(defn message-list []
-  [:div {:class "message-list"}
-   [:ul
-    (map-indexed
-     (fn [id message]
-       ^{:key id}
-       [:li message])
-     @messages)]])
-
-(defn message-input []
-  (r/with-let [value (r/atom nil)]
-    [:input.form-control
-     {:type        "text"
-      :class       "text-input"
-      :placeholder "type in a message"
-      :value       @value
-      :on-change   #(reset! value (-> % .-target .-value))
-      :on-key-down #(when (= (.-keyCode %) 13)
-                      (ws/send-transit-msg!
-                       {:message @value :user (:user @app-state)})
-                      (reset! value nil))}]))
+                  :class "login-input"
+                  :value @v
+                  :placeholder "Username"
+                  :on-change #(reset! v (-> % .-target .-value))}]
+         [:span {:class "bottom"}]
+         [:span {:class "right"}]
+         [:span {:class "top"}]
+         [:span {:class "left"}]]
+        [:br]
+        [:button {:type "submit"
+                  :class "login-button"} "Start chatting!"]]])))
 
 (defn sidebar []
   [:div {:class "sidebar"}
-   [:h5 "Active Users:"]
    (into [:ul]
          (for [[k v] @users]
            ^{:key k} [:li v]))])
 
 (defn chat-view []
   [:div {:class "chat-view"}
-   [message-list]
-   [message-input]
-   [:div {:class "header"}
-    [:h3 "chat room"]]
+   [chat-history]
+   [chat-input]
    [sidebar]])
 
 (defn app-container
@@ -106,10 +154,6 @@
 
 (defn home-page []
   [app-container])
-
-(defn update-messages! [{:keys [message user]}]
-  (swap! messages #(vec (take 100 (conj % message))))
-  (swap! users assoc :active-user user))
 
 (def pages
   {:home #'home-page})
@@ -152,5 +196,4 @@
 
   (ajax/load-interceptors!)
   (hook-browser-navigation!)
-  (ws/make-websocket! (str "ws://" (.-host js/location) "/ws") update-messages!)
   (mount-components))

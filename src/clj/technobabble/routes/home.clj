@@ -1,29 +1,52 @@
 (ns technobabble.routes.home
   (:require
-   [clojure.tools.logging :as log]
    [technobabble.layout :as layout]
    [technobabble.middleware :as middleware]
-   [org.httpkit.server :refer [send! with-channel on-close on-receive]]))
+   [chord.http-kit :refer [with-channel]]
+   [compojure.core :refer :all]
+   [compojure.route :as route]
+   [clojure.core.async :as async]
+   [ring.util.response :as resp]
+   [medley.core :refer [random-uuid]]))
 
-(defonce channels (atom #{}))
+; Use a transducer to append a unique id to each message
+(defonce main-chan (async/chan 1 (map #(assoc % :id (random-uuid)))))
 
-(defn notify-clients [msg]
-  (doseq [channel @channels]
-    (send! channel msg)))
+(defonce main-mult (async/mult main-chan))
 
-(defn connect! [channel]
-  (log/info "channel open")
-  (swap! channels conj channel))
+(def users (atom {}))
 
-(defn disconnect! [channel status]
-  (log/info "channel closed:" status)
-  (swap! channels #(remove #{channel} %)))
-
-(defn ws-handler [request]
-  (with-channel request channel
-    (connect! channel)
-    (on-close channel (partial disconnect! channel))
-    (on-receive channel #(notify-clients %))))
+(defn ws-handler
+  [req]
+  (with-channel req ws-ch
+    (let [client-tap (async/chan)
+          client-id (random-uuid)]
+      (async/tap main-mult client-tap)
+      (async/go-loop []
+        (async/alt!
+          client-tap ([message]
+                      (if message
+                        (do
+                          (async/>! ws-ch message)
+                          (recur))
+                        (async/close! ws-ch)))
+          ws-ch ([{:keys [message]}]
+                 (if message
+                   (let [{:keys [msg m-type]} message]
+                     (if (= m-type :new-user)
+                       (do
+                         (swap! users assoc client-id msg)
+                         (async/>! ws-ch  {:id (random-uuid)
+                                           :msg @users
+                                           :m-type :init-users})
+                         (async/>! main-chan (assoc message :msg {client-id (:msg message)})))
+                       (async/>! main-chan message))
+                     (recur))
+                   (do
+                     (async/untap main-mult client-tap)
+                     (async/>! main-chan {:m-type :user-left
+                                          :msg client-id})
+                     (swap! users dissoc client-id)))))))))
 
 (defn home-page [request]
   (layout/render request "home.html"))
