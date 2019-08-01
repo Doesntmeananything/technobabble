@@ -15,8 +15,8 @@ VALUES (:created, :username, :message)
 RETURNING *;
 
 
--- :name get-message-by-id :? :1
--- :doc Returns the messages matching an id (which should be only one)
+-- :name get-messages :? :*
+-- :doc Returns the last 5 messages
 SELECT username, message FROM messages
 ORDER BY created DESC
 LIMIT 5;
