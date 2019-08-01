@@ -41,7 +41,13 @@
                  [ring/ring-core "1.7.1"]
                  [ring/ring-defaults "0.3.2"]
                  [selmer "1.12.12"]
-                 [thheller/shadow-cljs "2.8.39" :scope "provided"]]
+                 [thheller/shadow-cljs "2.8.39" :scope "provided"]
+                 [org.clojure/core.async  "0.4.490"]
+                 [compojure "1.6.1"]
+                 [jarohen/chord "0.8.1"]
+                 [reagent "0.8.1"]
+                 [medley "1.1.0"]
+                 [http-kit "2.4.0-alpha2"]]
 
   :min-lein-version "2.0.0"
 
