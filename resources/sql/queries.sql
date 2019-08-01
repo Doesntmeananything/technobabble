@@ -1,32 +1,22 @@
 -- :name create-user! :! :n
--- :doc creates a new user record
-INSERT INTO users
-(id, pass)
-VALUES (:id, :pass)
-
--- :name update-user! :! :n
--- :doc updates an existing user record
-UPDATE users
-SET id = :id
-WHERE id = :id
+-- :doc Creates a new user record. The password is expected to be bcrypt+sha512,
+--  with maximum length of 162 characters, so don't use longer salts than
+--  hashers' default.
+INSERT INTO users (username, password) VALUES (:username, :password);
 
 -- :name get-user :? :1
--- :doc retrieves a user record given the id
-SELECT * FROM users
-WHERE id = :id
+-- :doc Looks for a user record based on the username.
+SELECT * FROM users WHERE username = :username;
 
--- :name delete-user! :! :n
--- :doc deletes a user record given the id
-DELETE FROM users
-WHERE id = :id
+-- :name create-message! :<! :1
+-- :doc Creates a new message record
+INSERT INTO messages (created, username, message)
+VALUES (:created, :username, :message)
+RETURNING *;
 
--- :name save-message! :! :n
--- creates a new message
-INSERT INTO messages
-(id, content, written_by, timestamp)
-VALUES (:id, :content, :written_by, :timestamp)
 
--- :name get-messages :? :*
--- selects all available messages
-SELECT * from messages 
-ORDER BY timestamp
+-- :name get-message-by-id :? :1
+-- :doc Returns the messages matching an id (which should be only one)
+SELECT username, message FROM messages
+ORDER BY created DESC
+LIMIT 5;
