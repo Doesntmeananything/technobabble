@@ -1,6 +1,9 @@
 html,
 body {
-	font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  background-color: #090821;
+  margin: 0px;
+  padding: 0px;
 }
 @font-face {
   font-family: 'Material Icons';
@@ -41,62 +44,249 @@ li {
   list-style: none;
 }
 
-body {
-  margin: 0px;
-  padding: 0px;
+form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
 }
 
 .chat-view {
 	display: grid;
 		width: 100vw;
 		height: 100vh;
-		grid-template-rows: 0px 1fr 50px;
+		grid-template-rows: 1fr 50px;
 		grid-template-columns: 200px 1fr;
-		grid-template-areas: "header header"
-				     "sidebar message-list"
-				     "text-input text-input";
-}
-
-.header {
-    grid-area: header;
-    background-color: grey;
+		grid-template-areas: "sidebar chat-history"
+				     "sidebar chat-input";
 }
 
 .sidebar {
     grid-area: sidebar;
-    background-color: whitesmoke;
+    background-color:rgba(39,41,84,.5);
+    color: #fff;
     max-height: calc(100vh-200px);
-    overflow-y: scroll;
-}
-
-.message-list {
-    grid-area: message-list;
-    background-color: white;
-    max-height: calc(100vh-200px);
-    overflow: auto;
     display: flex;
-    flex-direction: column-reverse;
+    justify-content: center;
+    padding-top: 12px;
 }
 
-.text-input {
-    grid-area: text-input;
-    background-color: whitesmoke;
+.chat-history {
+    grid-area: chat-history;
+    background-color: #2d3058;
+    color: #fff;
+    overflow: auto;
+    padding-left: 12px;
+}
+
+.chat-input {
+    grid-area: chat-input;
+    background-color:rgba(39,41,84,.5);
     width: 100%;
 }
 
-.login-container {
-    display: grid;
-    width: 100vw;
-    height: 100vh;
-    grid-template-rows: 1fr 1fr 1fr;
-    grid-template-columns: 1fr 1fr 1fr; 
-    grid-template-areas: ". . ."
-                         ". login ."
-                         ". . .";
+.chat-input-form {
+  display: flex;
+  flex-direction: row-reverse;
+  position: relative;
 }
 
-.login {
-    grid-area: login;
-    align-self: center;
-    justify-self: center;
+.login-container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  position: relative;
+}
+
+.login-input-container {
+  position: relative;
+}
+
+.login-input {
+  color: white;
+  font-size: inherit;
+  font-family: inherit;
+  background-color: hsl(236, 32%, 26%);
+  padding: 0.35em 0.45em;
+  border: 1px solid transparent;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.login-input:focus {
+  outline: none;
+}
+
+.login-input::placeholder {
+  color: hsla(0, 0%, 100%, 0.6);
+}
+
+span {
+  position: absolute;
+  background-color: #3cefff;
+  transition: transform 0.5s ease;
+}
+
+.bottom,
+.top {
+  height: 1px;
+  left: 0;
+  right: 0;
+  transform: scaleX(0);
+}
+
+.left,
+.right {
+  width: 1px;
+  top: 0;
+  bottom: 0;
+  transform: scaleY(0);
+}
+
+.bottom {
+  bottom: 0;
+  transform-origin: bottom right;
+}
+
+.login-input:focus ~ .bottom {
+  transform-origin: bottom left;
+  transform: scaleX(1);
+}
+
+.right {
+  right: 0;
+  transform-origin: top right;
+}
+
+.login-input:focus ~ .right {
+  transform-origin: bottom right;
+  transform: scaleY(1);
+}
+
+.top {
+  top: 0;
+  transform-origin: top left;
+}
+
+.login-input:focus ~ .top {
+  transform-origin: top right;
+  transform: scaleX(1);
+}
+
+.left {
+  left: 0;
+  transform-origin: bottom left;
+}
+
+.login-input:focus ~ .left {
+  transform-origin: top left;
+  transform: scaleY(1);
+}
+
+button {
+  z-index: 1;
+  position: relative;
+  font-size: inherit;
+  font-family: inherit;
+  color: white;
+  padding: 0.5em 1em;
+  outline: none;
+  border: none;
+  background-color: hsl(236, 32%, 26%);
+  overflow: hidden;
+  transition: color 0.4s ease-in-out;
+}
+
+.login-button::before {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  background-color: #3cefff;
+  transform-origin: center;
+  transform: translate3d(-50%, -50%, 0) scale3d(0, 0, 0);
+  transition: transform 0.45s ease-in-out;
+}
+
+.login-button:hover {
+  cursor: pointer;
+  color: #161616;
+}
+
+.login-button:hover::before {
+  transform: translate3d(-50%, -50%, 0) scale3d(15, 15, 15);
+}
+
+.chat-input-field {
+  width: 100vw;
+  color: white;
+  font-size: inherit;
+  font-family: inherit;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-bottom-color: hsla(185, 100%, 62%, 0.2);
+}
+
+.chat-input-field:focus {
+  outline: none;
+}
+
+.chat-input-field::placeholder {
+  color: hsla(0, 0%, 100%, 0.6);
+}
+
+.chat-input-span {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #3cefff;
+  transform-origin: bottom right;
+  transform: scaleX(0);
+  transition: transform 1s ease;
+}
+
+.chat-input-field:focus ~ span {
+  transform-origin: bottom left;
+  transform: scaleX(1);
+}
+
+button {
+  z-index: 1;
+  font-size: inherit;
+  font-family: inherit;
+  color: white;
+  padding: 0.5em 1em;
+  outline: none;
+  border: none;
+  background-color: hsl(236, 32%, 26%);
+}
+
+.chat-input-button:hover {
+  cursor: pointer;
+  animation: jelly 0.5s;
+}
+
+@keyframes jelly {
+  0%,
+  100% {
+    transform: scale(1, 1);
+  }
+  25% {
+    transform: scale(0.9, 1.1);
+  }
+  50% {
+    transform: scale(1.1, 0.9);
+  }
+  75% {
+    transform: scale(0.95, 1.05);
+  }
 }
