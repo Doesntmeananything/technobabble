@@ -24,7 +24,7 @@
     (try
       (db/create-user!
        (-> user
-           (dissoc :pass-confirm)
+           (dissoc :password-confirm)
            (update :password hashers/encrypt)))
       (-> {:result :ok}
           (response/ok)
