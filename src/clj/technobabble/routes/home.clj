@@ -3,7 +3,7 @@
    [technobabble.layout :as layout]
    [technobabble.middleware :as middleware]
    [chord.http-kit :refer [with-channel]]
-   [compojure.core :refer :all]
+   [compojure.core :refer [defroutes GET]]
    [compojure.route :as route]
    [clojure.core.async :as async]
    [ring.util.response :as resp]
@@ -48,11 +48,9 @@
                                           :msg client-id})
                      (swap! users dissoc client-id)))))))))
 
-(defn home-page [request]
-  (layout/render request "home.html"))
+(defn home-page []
+  (layout/render "home.html"))
 
-(defn home-routes []
-  [""
-   {:middleware [middleware/wrap-csrf]}
-   ["/" {:get home-page}]
-   ["/ws" {:get ws-handler}]])
+(defroutes home-routes
+  (GET "/" [] (home-page))
+  (GET "/ws" [] ws-handler))
