@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Memento</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="stylesheet" href="/assets/bootswatch/bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="/assets/bootswatch/bootswatch.min.css">
+    <link rel="stylesheet" href="/css/memento.css">
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="/assets/bower_components/html5shiv/dist/html5shiv.js"></script>
+    <script src="/assets/bower_components/respond/dest/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+<div class="bs-component" id="navbar">
+</div>
+<div class="container">
+    <div>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+                <div class="page-header" id="header">
+                    <h1 id="forms">Memento</h1>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2">
+                <div class="bs-component">
+                    <a id="content"></a>
+                    <div id="content-section">
+                        Loading...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="alert" class="col-sm-6 col-sm-offset-3">
+            <!-- alerts will go here
+            <div class="alert alert-dismissible alert-info">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <strong>Heads up!</strong> This is a placeholder <a href="#" class="alert-link">alert that needs your attention</a>, but it's
+                not
+                super important.
+            </div>
+            -->
+        </div>
+    </div>
+
+    <footer>
+        <div class="row">
+            <div class="col-sm-6 col-sm-offset-3" style="text-align: center">
+                <p>&copy <a href="https://numergent.com" target="_new">Numergent Limited</a></p>
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="/assets/jquery.appear.js"></script>
+{% script "/js/memento.js" %}
+
+</body>
+</html>

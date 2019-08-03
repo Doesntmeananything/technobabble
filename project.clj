@@ -55,7 +55,6 @@
                  [org.clojure/core.async  "0.4.490"]
                  [compojure "1.6.1"]
                  [jarohen/chord "0.8.1"]
-                 [reagent "0.8.1"]
                  [medley "1.1.0"]
                  [http-kit "2.4.0-alpha2"]]
 
@@ -75,6 +74,7 @@
    :builds
    {:app
     {:target :browser
+     :compiler-options {:externs ["react/externs/react.js" "externs/jquery-1.9.js" "externs/misc-externs.js"]}
      :output-dir "target/cljsbuild/public/js"
      :asset-path "/js"
      :modules {:app {:entries [technobabble.app]}}
