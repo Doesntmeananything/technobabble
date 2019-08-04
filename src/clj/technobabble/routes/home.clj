@@ -49,8 +49,18 @@
                      (swap! users dissoc client-id)))))))))
 
 (defn home-page []
-  (layout/render "home.html"))
+  (layout/render "bootswatch.html"))
+
+(defn about-page []
+  (layout/render "about.html"))
 
 (defroutes home-routes
   (GET "/" [] (home-page))
-  (GET "/ws" [] ws-handler))
+  (GET "/ws" [] ws-handler)
+  (GET "/about" [] (about-page))
+  (GET "/record" [] (home-page))
+  (GET "/login" [] (home-page))
+  (GET "/signup" [] (home-page))
+  (GET "/remember" [] (home-page))
+  (GET "/regard" [] (home-page))
+  (GET "/thread/*" [] (home-page)))

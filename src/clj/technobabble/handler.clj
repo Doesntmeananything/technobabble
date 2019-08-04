@@ -1,17 +1,16 @@
 (ns technobabble.handler
-  (:require
-   [technobabble.middleware :as middleware]
-   [technobabble.layout :refer [error-page]]
-   [technobabble.routes.home :refer [home-routes]]
-   [technobabble.routes.services :refer [service-routes]]
-   [technobabble.env :refer [defaults]]
-   [mount.core :as mount]
-   [compojure.core :refer [routes wrap-routes]]
-   [compojure.route :as route]))
+  (:require [compojure.core :refer [routes wrap-routes]]
+            [compojure.route :as route]
+            [technobabble.layout :refer [error-page]]
+            [technobabble.routes.home :refer [home-routes]]
+            [technobabble.routes.api :refer [service-routes]]
+            [technobabble.env :refer [defaults]]
+            [mount.core :as mount]
+            [technobabble.middleware :as middleware]))
 
 (mount/defstate init-app
-  :start ((or (:init defaults) (fn [])))
-  :stop  ((or (:stop defaults) (fn []))))
+  :start ((or (:init defaults) identity))
+  :stop  ((or (:stop defaults) identity)))
 
 (def app-routes
   (routes
@@ -25,4 +24,3 @@
                   :title "page not found"})))))
 
 (defn app [] (middleware/wrap-base #'app-routes))
-

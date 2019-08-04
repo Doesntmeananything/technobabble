@@ -1,15 +1,13 @@
-(ns memento.routes.api
+(ns technobabble.routes.api
   (:require [buddy.auth :refer [authenticated? throw-unauthorized]]
             [buddy.auth.accessrules :refer [restrict]]
             [buddy.auth.backends.token :refer [token-backend]]
             [buddy.auth.middleware :refer [wrap-authentication wrap-authorization]]
             [compojure.api.meta :refer [restructure-param]]
             [compojure.api.sweet :refer [defapi context PATCH POST GET PUT DELETE]]
-            [memento.middleware :refer [token-auth-mw]]
-            [memento.routes.api.auth :as auth]
-            [memento.routes.api.memory :as memory]
-            [memento.routes.api.reminder :as reminder]
-            [memento.routes.api.thought-cluster :as cluster]
+            [technobabble.middleware :refer [token-auth-mw]]
+            [technobabble.routes.api.auth :as auth]
+            [technobabble.routes.api.message :as message]
             [ring.util.http-response :refer :all]
             [schema.core :as s]))
 
@@ -38,43 +36,15 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(s/defschema Reminder
-  {:id                        s/Uuid
-   :type-id                   s/Str
-   :thought-id                s/Uuid
-   :created                   s/Inst
-   :next-date                 (s/maybe s/Inst)
-   :properties                s/Any
-   (s/optional-key :username) s/Str
-   (s/optional-key :thought)  s/Str                         ; Returned when querying for pending reminders
-   })
-
-(s/defschema Thought
+(s/defschema Message
   {:id                         s/Uuid
    :username                   s/Str
-   :thought                    s/Str
-   :created                    s/Inst
-   :archived?                  s/Bool
-   (s/optional-key :root-id)   (s/maybe s/Uuid)
-   (s/optional-key :follow-id) (s/maybe s/Uuid)
-   (s/optional-key :status)    s/Keyword
-   (s/optional-key :reminders) [Reminder]
-   })
+   :message                   s/Str
+   :created                    s/Inst})
 
-(s/defschema ThoughtCluster
-  {:id       s/Uuid
-   :username s/Str
-   :created  s/Inst})
-
-(s/defschema ThoughtSearchResult
+(s/defschema MessageSearchResult
   {:total        s/Int
-   :pages        s/Int
-   :current-page s/Int
-   :results      [Thought]})
-
-(s/defschema ThreadResult
-  {:id      s/Uuid
-   :results [Thought]})
+   :results      [Message]})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Services
@@ -84,7 +54,7 @@
   {:swagger {:ui   "/swagger-ui"
              :spec "/swagger.json"
              :data {:info {:version     "1.0.0"
-                           :title       "Memento API"
+                           :title       "technobabble API"
                            :description "Signup and data access"}}}}
 
   (context "/api/auth" []
@@ -119,152 +89,22 @@
       (auth/signup! username password)))
 
   (context "/api" []
-    :tags ["THOUGHTS"]
+    :tags ["MESSAGES"]
 
     ;; You'll need to be authenticated for these
     :middleware [token-auth-mw]
     :auth-rules authenticated?
     :header-params [authorization :- s/Str]
 
-
-    (GET "/search" []
-      :summary "Searches the thoughts"
-      :query-params [{q :- s/Str ""}
-                     {page :- s/Int 0}
-                     {all? :- s/Bool false}]
+    (GET "/messages" []
+      :summary "Gets the latest messages"
+      :return MessageSearchResult
       :auth-data auth-data
-      (memory/query-thoughts (:username auth-data) q page all?))
+      (message/get-messages (:username auth-data)))
 
-    (GET "/thoughts" []
-      :summary "Gets the first page of thoughts"
-      :return ThoughtSearchResult
-      :query-params [{page :- s/Int 0}
-                     {all? :- s/Bool false}]
+    (POST "/messages" []
+      :summary "Creates a new message"
+      :return Message
+      :body-params [message :- s/Str]
       :auth-data auth-data
-      (memory/query-thoughts (:username auth-data) nil page all?))
-
-    (GET "/thoughts/:id" []
-      :summary "Gets a thought"
-      :path-params [id :- s/Uuid]
-      :return Thought
-      :auth-data auth-data
-      (memory/get-thought (:username auth-data) id))
-
-    (POST "/thoughts" []
-      :summary "Creates a new thought"
-      :return Thought
-      :body-params [thought :- s/Str
-                    {follow-id :- (s/maybe s/Uuid) nil}]
-      :auth-data auth-data
-      (memory/save-thought (:username auth-data) thought follow-id))
-
-    (PATCH "/thoughts/:id" []
-      :summary "Updates an existing thought. Needs to be open."
-      ;; I'm not 100% sure if patch should return a value, according to the standard, but
-      ;; doing so here because it simplifies things if we have the full thought as it comes
-      ;; from the server.
-      :return Thought
-      :path-params [id :- s/Uuid]
-      :body-params [thought :- s/Str]
-      :auth-data auth-data
-      (memory/update-thought (:username auth-data) id thought))
-
-    (PUT "/thoughts/:id/archive" []
-      :summary "Archives/de-archives a thought"
-      :return Thought
-      :path-params [id :- s/Uuid]
-      :body-params [archived? :- s/Bool]
-      :auth-data auth-data
-      (memory/archive-thought (:username auth-data) id archived?))
-
-    (DELETE "/thoughts/:id" []
-      :summary "Deletes an existing thought. Needs to be open."
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (memory/delete-thought (:username auth-data) id))
-
-    (GET "/threads/:id" []
-      :summary "Gets a thread"
-      :return ThreadResult
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (memory/get-thread (:username auth-data) id)))
-
-  (context "/api" []
-    :tags ["CLUSTERS"]
-
-    ;; You'll need to be authenticated for these
-    :middleware [token-auth-mw]
-    :auth-rules authenticated?
-    :header-params [authorization :- s/Str]
-
-    (GET "/clusters" []
-      :summary "Gets the thoughts in a cluster"
-      :return [ThoughtCluster]
-      :auth-data auth-data
-      (cluster/get-list (:username auth-data)))
-
-    (GET "/clusters/:id" []
-      :summary "Gets the thoughts in a cluster"
-      :return ThoughtSearchResult
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (cluster/get-cluster (:username auth-data) id))
-
-    (POST "/clusters" []
-      :summary "Creates a new thought cluster"
-      :return s/Int
-      :body-params [thought-ids :- [s/Uuid]]
-      :auth-data auth-data
-      (cluster/create-cluster (:username auth-data) thought-ids))
-
-    (DELETE "/clusters/:cluster-id/:thought-id" []
-      :summary "Deletes a thought from a cluster"
-      :path-params [cluster-id :- s/Uuid
-                    thought-id :- s/Uuid]
-      :auth-data auth-data
-      (cluster/remove-thought (:username auth-data) cluster-id thought-id))
-    )
-
-  (context "/api" []
-    :tags ["REMINDERS"]
-
-    ;; You'll need to be authenticated for these
-    :middleware [token-auth-mw]
-    :auth-rules authenticated?
-    :header-params [authorization :- s/Str]
-
-    (POST "/reminders" []
-      :summary "Creates a new reminder for a thought"
-      :return Reminder
-      :body-params [thought-id :- s/Uuid
-                    type-id :- s/Str]
-      :auth-data auth-data
-      (reminder/create-new (:username auth-data) thought-id type-id))
-
-    (GET "/reminders/:id" []
-      :summary "Retrieves a specific reminder by id"
-      :return Reminder
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (reminder/get-reminder (:username auth-data) id))
-
-    (PATCH "/reminders/:id" []
-      :summary "Patches a reminder's next-date"
-      :path-params [id :- s/Uuid]
-      :body-params [next-date :- (s/maybe s/Inst)]
-      :auth-data auth-data
-      (reminder/set-next-date (:username auth-data) id next-date))
-
-    (GET "/reminders" []
-      :summary "Retrieves all pending reminders"
-      :return [Reminder]
-      :auth-data auth-data
-      (reminder/get-pending-reminders (:username auth-data)))
-
-    (POST "/reminders/viewed/:id" []
-      :summary "Marks a reminder as viewed"
-      :path-params [id :- s/Uuid]
-      :return s/Int
-      :auth-data auth-data
-      (reminder/mark-as-viewed! (:username auth-data) id))))
+      (message/save-message (:username auth-data) message))))
