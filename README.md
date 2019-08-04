@@ -34,10 +34,6 @@ I set these in place to allow editing while avoiding second-guessing myself in t
 
 If at any point in the future you consider a thought to no longer be relevant, you can then just archive it. This will remove it from the default searches while keeping it still available, as well as keeping it inside any trains of thought you had recorded.
 
-### Reminders
-
-technobabble allows you to set reminders for thoughts, so you can re-evaluate them later. Currently the only reminder type is [spaced repetition on pre-set intervals](https://gitlab.com/Numergent/technobabble/issues/50).
-
 ## Installation
 
 ### Prerequisites
@@ -90,7 +86,3 @@ Running `lein test` will run the tests against the `technobabble_test` database 
 If you're using Cursive Clojure, bear in mind it does not yet support a way to launch a REPL with specific environment profile. Since the application reads its database connection parameters from the environment configuration, if you start a REPL from Cursive and run the tests against it, you'll be running them against the development database and not the test one.
 
 Make sure you either create a REPL profile specifically for the test settings, or just run the tests via lein.
-
-## License
-
-Copyright © 2015-2017 Numergent Limited. [Released under the MIT License](https://tldrlegal.com/license/mit-license).
