@@ -1,0 +1,17 @@
+/target
+*.iml
+.idea
+/classes
+/checkouts
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+*~
+*.log
+resources/public/js/
+technobabble.out
+dev-config.edn
+test-config.edn

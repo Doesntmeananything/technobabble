@@ -1,0 +1,83 @@
+.btn-group, .btn {
+    margin-right: 5px
+}
+
+.btn-group .btn {
+    margin-right: 1px;
+}
+
+.thought {
+    margin-bottom: 40px;
+}
+
+.thought .memory {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.4;
+}
+
+@media (min-width: 768px) {
+    .memory {
+        font-size: 14.5px;
+    }
+}
+
+
+.icon-margin-both {
+    margin-left: 2px;
+    margin-right: 5px;
+}
+
+.icon-margin-both-wide {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.icon-margin-left {
+    margin-left: 5px
+}
+
+#content-section #reminder-list p {
+    font-size: 16px;
+}
+
+
+.about-page {
+    font-size: 16px;
+}
+
+
+.hover-wrapper .show-on-hover {
+    visibility: hidden;
+}
+
+.hover-wrapper:hover .show-on-hover {
+    visibility: visible;
+}
+
+.reminder-item p {
+    margin-bottom: 0.5em;
+}
+
+.reminder-item {
+    margin-bottom: 1em;
+}
+
+
+@media (max-width: 768px) {
+    .page-header h1 {
+        font-size: 2.5em;
+    }
+    .thought .memory {
+        font-size: 16px;
+    }
+    .thought {
+        margin-bottom: 20px;
+    }
+    a .btn {
+        font-size: 14px;
+    }
+    .hover-wrapper .show-on-hover {
+        visibility: visible;
+    }
+}

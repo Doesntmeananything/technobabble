@@ -1,0 +1,5 @@
+{:dev          true
+ :database-url "postgres://technobabble:testdb@localhost/technobabble_test"
+ :auth-conf    {:passphrase "testpassword"
+                :pubkey     "keys/dev_auth_pubkey.pem"
+                :privkey    "keys/dev_auth_privkey.pem"}}
