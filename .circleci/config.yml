@@ -4,6 +4,7 @@ jobs:
     docker:
       # Since we include lein in the repo, all we need is a JDK.
       - image: openjdk:8
+      - image: circleci/clojure:lein-2.7.1
       - image: postgres:9.4.1
         # The official Postgres docker images will create your DB for you
         # if you set the POSTGRES_DB environment variable.
