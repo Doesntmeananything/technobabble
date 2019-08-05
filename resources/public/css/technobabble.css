@@ -96,3 +96,54 @@ body {
       transform: translateX(100%);
     }
   }
+
+  .chat-view {
+    display: grid;
+      width: 100vw;
+      height: 100vh;
+      grid-template-rows: 1fr 50px;
+      grid-template-columns: 200px 1fr;
+      grid-template-areas: "sidebar chat-history"
+               "sidebar chat-input";
+  }
+  
+  .sidebar {
+      grid-area: sidebar;
+      background-color:rgba(39,41,84,.5);
+      color: #fff;
+      max-height: calc(100vh-200px);
+      display: flex;
+      justify-content: center;
+      padding-top: 12px;
+  }
+  
+  .chat-history {
+      grid-area: chat-history;
+      background-color: #2d3058;
+      color: #fff;
+      overflow: auto;
+      padding-left: 12px;
+  }
+  
+  .chat-input {
+      grid-area: chat-input;
+      background-color:rgba(39,41,84,.5);
+      width: 100%;
+  }
+  
+  .chat-input-form {
+    display: flex;
+    flex-direction: row-reverse;
+    position: relative;
+  }
+  
+  .login-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+  }
+  
