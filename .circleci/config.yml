@@ -28,6 +28,6 @@ jobs:
       # Formatting
       - run: lein cljfmt fix
       # Linting
-      - run: lein eastwood
+      - run: lein eastwood "{:exclude-linters [:implicit-dependencies]}"
       # run tests
       # - run: lein test
