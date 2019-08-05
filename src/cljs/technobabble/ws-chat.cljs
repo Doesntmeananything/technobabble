@@ -63,21 +63,20 @@
                                                     :user (:user @app-state)
                                                     :m-type :chat}))
                       (reset! v nil))}
-        [:div {:class "chat-input-form"}
-         [:input {:type "text"
-                  :class "chat-input-field"
-                  :value @v
-                  :placeholder "Type a message"
-                  :on-change #(reset! v (-> % .-target .-value))}]
-         [:span {:class "chat-input-span"}]
-         [:br]]]])))
+        [:input {:type "text"
+                 :class "chat-input-field form-control"
+                 :value @v
+                 :placeholder "Type a message"
+                 :on-change #(reset! v (-> % .-target .-value))}]]])))
 
 (defn chat-history []
   (reagent/create-class
    {:render (fn []
               [:div {:class "chat-history"}
                (for [m @msg-list]
-                 ^{:key (:id m)} [:p (str (:user m) ": " (:msg m))])])
+                 ^{:key (:id m)} [:p {:class "font-weight-bold"} (:user m)
+                                  [:br]
+                                  [:span {:class "lead"} (:msg m)]])])
     :component-did-update (fn [this]
                             (let [node (reagent/dom-node this)]
                               (set! (.-scrollTop node) (.-scrollHeight node))))}))
@@ -94,19 +93,19 @@
                       (setup-websockets!))}
         [:div {:class "login-input-container"}
          [:input {:type "text"
-                  :class "login-input"
+                  :class "login-input form-control"
                   :value @v
-                  :placeholder "Username"
+                  :placeholder "Chat username"
                   :on-change #(reset! v (-> % .-target .-value))}]]
         [:br]
         [:button {:type "submit"
-                  :class "login-button"} "Start chatting!"]]])))
+                  :class "login-button btn btn-success"} "Start chatting!"]]])))
 
 (defn sidebar []
   [:div {:class "sidebar"}
-   (into [:ul]
+   (into [:ul {:class "list-group list-group-flush"}]
          (for [[k v] @users]
-           ^{:key k} [:li v]))])
+           ^{:key k} [:li {:class "list-group-item"} v]))])
 
 (defn chat-view []
   [:div {:class "chat-view"}
