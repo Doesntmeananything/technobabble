@@ -27,7 +27,16 @@ jobs:
           key: v1-dependencies-{{ checksum "project.clj" }}
       # Formatting
       - run: lein cljfmt fix
-      # Linting
+      # Linting; implicit-dependencies is a bit wonky for one file
       - run: lein eastwood "{:exclude-linters [:implicit-dependencies]}"
+      - run: 
+        - name: "Database setup"
+        - command: |
+          apt-get update -y
+          apt-get install postgresql-client -y
+          psql -h postgres -U postgres < db-setup.sql
+          echo $DATABASE_URL
+          cp resources/test-config.default.edn ./test-config.edn
+          lein with-profile test run migrate
       # run tests
       # - run: lein test

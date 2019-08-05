@@ -5,4 +5,3 @@ CREATE DATABASE technobabble_test WITH OWNER technobabble;
 CREATE EXTENSION "uuid-ossp";
 \c technobabble_test
 CREATE EXTENSION "uuid-ossp";
-
