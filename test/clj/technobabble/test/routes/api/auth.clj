@@ -18,14 +18,9 @@
      #'technobabble.db.core/*db*)
     (f)))
 
-;;;;
 ;;;; Tests
-;;;;
 
-
-;;;
 ;;; Authentication
-;;;
 
 (deftest test-login
   (tdb/wipe-database! *db*)

@@ -5,11 +5,7 @@
             [technobabble.config :refer [env]]
             [mount.core :as mount]))
 
-
-;;;;
 ;;;; Definitions
-;;;;
-
 
 (use-fixtures
   :once
@@ -21,10 +17,7 @@
 
 (conman/bind-connection *db* "sql/test-queries.sql")
 
-;;;;
 ;;;; Basic tests
-;;;;
-
 
 (deftest test-create-user
   (wipe-database! *db*)

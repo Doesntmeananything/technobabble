@@ -7,9 +7,7 @@
             [taoensso.timbre :as timbre])
   (:import (java.io ByteArrayOutputStream InputStream)))
 
-;;;;
 ;;;; Helpers
-;;;;
 
 (defn transit->clj
   "Receives a byte array expected to contain transit+json, and coverts it
@@ -64,12 +62,6 @@
         data     (transit->clj (:body response))]
     [response data]))
 
-(defn patch-request
-  "Makes a patch request to a URL with a body. Returns a vector with the
-  response and the translated body."
-  [^String url id req-body auth-token]
-  (req-with-body :patch url id nil req-body auth-token))
-
 (defn post-request
   "Makes a post request to a URL with a body. Returns a vector with the
   response and the translated body."
@@ -85,14 +77,6 @@
    (put-request url id req-body auth-token))
   ([^String url id path req-body auth-token]
    (req-with-body :put url id path req-body auth-token)))
-
-(defn del-request
-  "Makes a delete request to a URL with a body, under a specific path. Returns
-  a vector with the response and the translated body."
-  ([^String url id auth-token]
-   (req-with-body :delete url id nil nil auth-token))
-  ([^String url id path auth-token]
-   (req-with-body :delete url id path nil auth-token)))
 
 (defn invoke-login
   "Invokes the login function and returns a token"
