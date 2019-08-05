@@ -1,6 +1,6 @@
 (defproject technobabble "0.7"
   :description "technobabble"
-  :url "https://technobabbleapp.herokuapp.com/"
+  :url "https://technobabble-app.herokuapp.com/"
 
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [org.clojure/clojurescript "1.10.145" :scope "provided"]
@@ -54,7 +54,9 @@
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-cloverage "1.0.9"]
             [lein-heroku "0.5.3"]
-            [migratus-lein "0.5.0"]]
+            [migratus-lein "0.5.0"]
+            [jonase/eastwood "0.3.5"]
+            [lein-cljfmt "0.6.4"]]
 
   :migratus {:store         :database
              :migration-dir "migrations"}
