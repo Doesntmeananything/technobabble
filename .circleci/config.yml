@@ -31,7 +31,7 @@ jobs:
       - run: lein eastwood "{:exclude-linters [:implicit-dependencies]}"
       - run: 
         - name: "Database setup"
-        - command: |
+        - command: |-
             apt-get update -y
             apt-get install postgresql-client -y
             psql -h postgres -U postgres < db-setup.sql
