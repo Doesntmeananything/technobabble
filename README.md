@@ -1,17 +1,12 @@
 # technobabble
 
-technobabble started as an experiment on introspection - private note-taking for thoughts you may want to revisit in the future.
-
-It's a work in progress, alpha experimental project. Features are likely to change
-
-[![build status](https://gitlab.com/Numergent/technobabble/badges/master/build.svg)](https://gitlab.com/Numergent/technobabble/commits/master) [![codecov](https://codecov.io/gl/Numergent/technobabble/branch/master/graph/badge.svg)](https://codecov.io/gl/Numergent/technobabble)
+[![CircleCI](https://circleci.com/gh/Doesntmeananything/technobabble.svg?style=svg)](https://circleci.com/gh/Doesntmeananything/technobabble)
 
 ## Live version 
 
-[You can find a live version here](https://technobabbleapp.herokuapp.com/). It's on Heroku running on free dynos, so you may need to wait while it wakes up.
+[You can find a live version here](https://technobabble-app.herokuapp.com/). It's on Heroku running on free dynos, so you may need to wait while it wakes up.
 
 The user name does not need to be an e-mail address, although that will facilitate password reset in the future. You can use whatever login you fancy, though. 
-
 
 ## Usage
 
