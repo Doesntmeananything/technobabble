@@ -54,10 +54,5 @@
 (defroutes home-routes
   (GET "/" [] (home-page))
   (GET "/ws" [] ws-handler)
-  (GET "/about" [] (about-page))
-  (GET "/record" [] (home-page))
   (GET "/login" [] (home-page))
-  (GET "/signup" [] (home-page))
-  (GET "/remember" [] (home-page))
-  (GET "/regard" [] (home-page))
-  (GET "/thread/*" [] (home-page)))
+  (GET "/signup" [] (home-page)))

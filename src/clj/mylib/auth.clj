@@ -1,4 +1,4 @@
-(ns numergent.auth
+(ns mylib.auth
   (:require [buddy.sign.jwt :as jwt]
             [buddy.core.keys :as ks]
             [clj-time.core :as t]

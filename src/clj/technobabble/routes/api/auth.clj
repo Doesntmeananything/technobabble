@@ -1,5 +1,5 @@
 (ns technobabble.routes.api.auth
-  (:require [numergent.auth :as auth]
+  (:require [mylib.auth :as auth]
             [technobabble.config :refer [env]]
             [technobabble.db.user :as user]
             [ring.util.http-response :refer [ok unauthorized conflict created]]))

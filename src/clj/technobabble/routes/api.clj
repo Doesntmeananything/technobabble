@@ -8,14 +8,10 @@
             [technobabble.middleware :refer [token-auth-mw]]
             [technobabble.routes.api.auth :as auth]
             [technobabble.routes.api.memory :as memory]
-            [technobabble.routes.api.reminder :as reminder]
-            [technobabble.routes.api.thought-cluster :as cluster]
             [ring.util.http-response :refer :all]
             [schema.core :as s]))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Access handlers and wrappers
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defn access-error [_ _]
   (unauthorized {:error "unauthorized"}))
@@ -32,11 +28,7 @@
   [_ binding acc]
   (update-in acc [:letks] into [binding `(:identity ~'+compojure-api-request+)]))
 
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Services
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
+;;;; Schemas
 
 (s/defschema Reminder
   {:id                        s/Uuid
@@ -75,9 +67,7 @@
   {:id      s/Uuid
    :results [Thought]})
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Services
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defapi service-routes
   {:swagger {:ui   "/swagger-ui"
@@ -125,22 +115,6 @@
     :auth-rules authenticated?
     :header-params [authorization :- s/Str]
 
-    (GET "/search" []
-      :summary "Searches the thoughts"
-      :query-params [{q :- s/Str ""}
-                     {page :- s/Int 0}
-                     {all? :- s/Bool false}]
-      :auth-data auth-data
-      (memory/query-thoughts (:username auth-data) q page all?))
-
-    (GET "/thoughts" []
-      :summary "Gets the first page of thoughts"
-      :return ThoughtSearchResult
-      :query-params [{page :- s/Int 0}
-                     {all? :- s/Bool false}]
-      :auth-data auth-data
-      (memory/query-thoughts (:username auth-data) nil page all?))
-
     (GET "/thoughts/:id" []
       :summary "Gets a thought"
       :path-params [id :- s/Uuid]
@@ -154,114 +128,4 @@
       :body-params [thought :- s/Str
                     {follow-id :- (s/maybe s/Uuid) nil}]
       :auth-data auth-data
-      (memory/save-thought (:username auth-data) thought follow-id))
-
-    (PATCH "/thoughts/:id" []
-      :summary "Updates an existing thought. Needs to be open."
-      ;; I'm not 100% sure if patch should return a value, according to the standard, but
-      ;; doing so here because it simplifies things if we have the full thought as it comes
-      ;; from the server.
-      :return Thought
-      :path-params [id :- s/Uuid]
-      :body-params [thought :- s/Str]
-      :auth-data auth-data
-      (memory/update-thought (:username auth-data) id thought))
-
-    (PUT "/thoughts/:id/archive" []
-      :summary "Archives/de-archives a thought"
-      :return Thought
-      :path-params [id :- s/Uuid]
-      :body-params [archived? :- s/Bool]
-      :auth-data auth-data
-      (memory/archive-thought (:username auth-data) id archived?))
-
-    (DELETE "/thoughts/:id" []
-      :summary "Deletes an existing thought. Needs to be open."
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (memory/delete-thought (:username auth-data) id))
-
-    (GET "/threads/:id" []
-      :summary "Gets a thread"
-      :return ThreadResult
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (memory/get-thread (:username auth-data) id)))
-
-  (context "/api" []
-    :tags ["CLUSTERS"]
-
-    ;; You'll need to be authenticated for these
-    :middleware [token-auth-mw]
-    :auth-rules authenticated?
-    :header-params [authorization :- s/Str]
-
-    (GET "/clusters" []
-      :summary "Gets the thoughts in a cluster"
-      :return [ThoughtCluster]
-      :auth-data auth-data
-      (cluster/get-list (:username auth-data)))
-
-    (GET "/clusters/:id" []
-      :summary "Gets the thoughts in a cluster"
-      :return ThoughtSearchResult
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (cluster/get-cluster (:username auth-data) id))
-
-    (POST "/clusters" []
-      :summary "Creates a new thought cluster"
-      :return s/Int
-      :body-params [thought-ids :- [s/Uuid]]
-      :auth-data auth-data
-      (cluster/create-cluster (:username auth-data) thought-ids))
-
-    (DELETE "/clusters/:cluster-id/:thought-id" []
-      :summary "Deletes a thought from a cluster"
-      :path-params [cluster-id :- s/Uuid
-                    thought-id :- s/Uuid]
-      :auth-data auth-data
-      (cluster/remove-thought (:username auth-data) cluster-id thought-id)))
-
-  (context "/api" []
-    :tags ["REMINDERS"]
-
-    ;; You'll need to be authenticated for these
-    :middleware [token-auth-mw]
-    :auth-rules authenticated?
-    :header-params [authorization :- s/Str]
-
-    (POST "/reminders" []
-      :summary "Creates a new reminder for a thought"
-      :return Reminder
-      :body-params [thought-id :- s/Uuid
-                    type-id :- s/Str]
-      :auth-data auth-data
-      (reminder/create-new (:username auth-data) thought-id type-id))
-
-    (GET "/reminders/:id" []
-      :summary "Retrieves a specific reminder by id"
-      :return Reminder
-      :path-params [id :- s/Uuid]
-      :auth-data auth-data
-      (reminder/get-reminder (:username auth-data) id))
-
-    (PATCH "/reminders/:id" []
-      :summary "Patches a reminder's next-date"
-      :path-params [id :- s/Uuid]
-      :body-params [next-date :- (s/maybe s/Inst)]
-      :auth-data auth-data
-      (reminder/set-next-date (:username auth-data) id next-date))
-
-    (GET "/reminders" []
-      :summary "Retrieves all pending reminders"
-      :return [Reminder]
-      :auth-data auth-data
-      (reminder/get-pending-reminders (:username auth-data)))
-
-    (POST "/reminders/viewed/:id" []
-      :summary "Marks a reminder as viewed"
-      :path-params [id :- s/Uuid]
-      :return s/Int
-      :auth-data auth-data
-      (reminder/mark-as-viewed! (:username auth-data) id))))
+      (memory/save-thought (:username auth-data) thought follow-id))))

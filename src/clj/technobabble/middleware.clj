@@ -14,7 +14,7 @@
             [ring.middleware.flash :refer [wrap-flash]]
             [immutant.web.middleware :refer [wrap-session]]
             [ring.middleware.defaults :refer [site-defaults wrap-defaults]]
-            [numergent.auth :as auth])
+            [mylib.auth :as auth])
   (:import [javax.servlet ServletContext]
            [org.joda.time ReadableInstant]))
 
