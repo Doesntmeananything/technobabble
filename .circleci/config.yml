@@ -1,8 +1,8 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/technobabble
     docker:
-      # Since we include lein in the repo, all we need is a JDK.
       - image: openjdk:8
       - image: circleci/clojure:lein-2.7.1
       - image: postgres:9.4.1
@@ -13,6 +13,8 @@ jobs:
           POSTGRES_DB: technobabble
     environment:
       DATABASE_URL=postgres://localhost/technobabble
+      LEIN_ROOT: nbd
+      JVM_OPTS: -Xmx3200m
     steps:
       - checkout
       # Pull the dependencies in a way that they're cached.
@@ -24,7 +26,11 @@ jobs:
             - $HOME/.m2
             - $HOME/.lein
           key: << checksum "project.clj" >>
+      # Linting
+      - run: lein eastwood "{:namespaces [:source-paths]}"
+      # Formatting
+      - run: lein cljfmt fix
       # Migrate the DB, then test.
-      - run: lein test
+      # - run: lein test
       # Push it out to Heroku on a successful master build.
-      - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
+      # - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
