@@ -1,1 +1,0 @@
-ALTER TABLE reminders ALTER COLUMN next_date DROP NOT NULL;

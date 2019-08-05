@@ -1,1 +1,0 @@
-ALTER TABLE thoughts DROP COLUMN "archived?";

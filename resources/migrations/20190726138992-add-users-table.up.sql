@@ -21,7 +21,7 @@ INSERT INTO users
   SELECT DISTINCT
     username,
     'change-to-hash'
-  FROM thoughts;
+  FROM messages;
 --;;
-ALTER TABLE thoughts
+ALTER TABLE messages
 ADD CONSTRAINT username_fk FOREIGN KEY (username) REFERENCES users (username);
