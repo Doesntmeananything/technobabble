@@ -30,42 +30,11 @@
 
 ;;;; Schemas
 
-(s/defschema Reminder
-  {:id                        s/Uuid
-   :type-id                   s/Str
-   :message-id                s/Uuid
-   :created                   s/Inst
-   :next-date                 (s/maybe s/Inst)
-   :properties                s/Any
-   (s/optional-key :username) s/Str
-   (s/optional-key :message)  s/Str                         ; Returned when querying for pending reminders
-   })
-
 (s/defschema Message
   {:id                         s/Uuid
    :username                   s/Str
    :message                    s/Str
-   :created                    s/Inst
-   :archived?                  s/Bool
-   (s/optional-key :root-id)   (s/maybe s/Uuid)
-   (s/optional-key :follow-id) (s/maybe s/Uuid)
-   (s/optional-key :status)    s/Keyword
-   (s/optional-key :reminders) [Reminder]})
-
-(s/defschema MessageCluster
-  {:id       s/Uuid
-   :username s/Str
-   :created  s/Inst})
-
-(s/defschema MessageSearchResult
-  {:total        s/Int
-   :pages        s/Int
-   :current-page s/Int
-   :results      [Message]})
-
-(s/defschema ThreadResult
-  {:id      s/Uuid
-   :results [Message]})
+   :created                    s/Inst})
 
 ;;;; Services
 
@@ -115,17 +84,15 @@
     :auth-rules authenticated?
     :header-params [authorization :- s/Str]
 
-    (GET "/messages/:id" []
-      :summary "Gets a message"
-      :path-params [id :- s/Uuid]
+    (GET "/messages" []
+      :summary "Gets latest messages"
       :return Message
       :auth-data auth-data
-      (message/get-message (:username auth-data) id))
+      (message/get-messages (:username auth-data)))
 
     (POST "/messages" []
       :summary "Creates a new message"
       :return Message
-      :body-params [message :- s/Str
-                    {follow-id :- (s/maybe s/Uuid) nil}]
+      :body-params [message :- s/Str]
       :auth-data auth-data
-      (message/save-message (:username auth-data) message follow-id))))
+      (message/save-message (:username auth-data) message))))

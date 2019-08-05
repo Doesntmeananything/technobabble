@@ -17,7 +17,7 @@
                  record))
       (bad-request! "Cannot add empty messages"))))
 
-(defn get-message
+(defn get-messages
   "Gets latest messages"
   []
   (if-let [existing (message/get-messages)]
