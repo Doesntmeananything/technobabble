@@ -8,8 +8,6 @@
             [taoensso.timbre :as timbre])
   (:import (clojure.lang ExceptionInfo)))
 
-;; TODO: I should really extract this to a library
-
 (def AuthConf
   {:passphrase String
    :pubkey     String
@@ -24,11 +22,9 @@
     (ks/private-key (io/resource privkey) passphrase)
     (ks/str->private-key privkey passphrase)))
 
-
 (defn pubkey [auth-conf]
   (ks/public-key
-    (io/resource (:pubkey auth-conf))))
-
+   (io/resource (:pubkey auth-conf))))
 
 (defn create-auth-token
   "Creates a token for a username. By default, the token has a validity of one day.
@@ -42,7 +38,6 @@
              (pkey auth-conf)
              {:alg :rs256 :exp expiration})))
 
-
 (defn decode-token
   "Decodes and returns a user token. Attempting to decode an expired or
    invalid token will return nil."
@@ -54,7 +49,6 @@
     (catch ExceptionInfo e
       (timbre/trace e "Token decode error")
       nil)))
-
 
 (defn decode-for-buddy
   "Function to be used for buddy's wrap-authentication. It'll decode
