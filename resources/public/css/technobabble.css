@@ -100,7 +100,7 @@ body {
   .chat-view {
     display: grid;
       width: 100vw;
-      height: 100vh;
+      height: 80vh;
       grid-template-rows: 1fr 50px;
       grid-template-columns: 200px 1fr;
       grid-template-areas: "sidebar chat-history"
@@ -109,8 +109,6 @@ body {
   
   .sidebar {
       grid-area: sidebar;
-      background-color:rgba(39,41,84,.5);
-      color: #fff;
       max-height: calc(100vh-200px);
       display: flex;
       justify-content: center;
@@ -119,15 +117,12 @@ body {
   
   .chat-history {
       grid-area: chat-history;
-      background-color: #2d3058;
-      color: #fff;
       overflow: auto;
       padding-left: 12px;
   }
   
   .chat-input {
       grid-area: chat-input;
-      background-color:rgba(39,41,84,.5);
       width: 100%;
   }
   
