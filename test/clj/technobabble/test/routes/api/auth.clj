@@ -5,7 +5,7 @@
             [technobabble.config :refer [env]]
             [technobabble.db.user :as user]
             [technobabble.test.db.core :as tdb]
-            [technobabble.test.routes.helpers :refer [post-request patch-request get-request put-request del-request invoke-login]]
+            [technobabble.test.routes.helpers :refer [post-request get-request]]
             [technobabble.db.core :refer [*db*]]
             [mylib.auth :refer [create-auth-token decode-token]] ; Only for validation, all other calls should go through the API
             [mount.core :as mount]))
