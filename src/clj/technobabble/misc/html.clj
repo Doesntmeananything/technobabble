@@ -9,8 +9,8 @@
         clean (.text (Jsoup/parse no-nl))]
     (string/replace clean #"\\n" "\n")))
 
-(defn clean-memory-text
-  "Removes the HTML from a memory's thought.
+(defn clean-message-text
+  "Removes the HTML from a message's thought.
   Probably best suited for a technobabble.utils, but we don't have one of those yet"
-  [memory]
-  (update-in memory [:thought] remove-html))
+  [message]
+  (update-in message [:thought] remove-html))

@@ -7,7 +7,7 @@
             [compojure.api.sweet :refer [defapi context PATCH POST GET PUT DELETE]]
             [technobabble.middleware :refer [token-auth-mw]]
             [technobabble.routes.api.auth :as auth]
-            [technobabble.routes.api.memory :as memory]
+            [technobabble.routes.api.message :as message]
             [ring.util.http-response :refer :all]
             [schema.core :as s]))
 
@@ -33,18 +33,18 @@
 (s/defschema Reminder
   {:id                        s/Uuid
    :type-id                   s/Str
-   :thought-id                s/Uuid
+   :message-id                s/Uuid
    :created                   s/Inst
    :next-date                 (s/maybe s/Inst)
    :properties                s/Any
    (s/optional-key :username) s/Str
-   (s/optional-key :thought)  s/Str                         ; Returned when querying for pending reminders
+   (s/optional-key :message)  s/Str                         ; Returned when querying for pending reminders
    })
 
-(s/defschema Thought
+(s/defschema Message
   {:id                         s/Uuid
    :username                   s/Str
-   :thought                    s/Str
+   :message                    s/Str
    :created                    s/Inst
    :archived?                  s/Bool
    (s/optional-key :root-id)   (s/maybe s/Uuid)
@@ -52,20 +52,20 @@
    (s/optional-key :status)    s/Keyword
    (s/optional-key :reminders) [Reminder]})
 
-(s/defschema ThoughtCluster
+(s/defschema MessageCluster
   {:id       s/Uuid
    :username s/Str
    :created  s/Inst})
 
-(s/defschema ThoughtSearchResult
+(s/defschema MessageSearchResult
   {:total        s/Int
    :pages        s/Int
    :current-page s/Int
-   :results      [Thought]})
+   :results      [Message]})
 
 (s/defschema ThreadResult
   {:id      s/Uuid
-   :results [Thought]})
+   :results [Message]})
 
 ;;;; Services
 
@@ -115,17 +115,17 @@
     :auth-rules authenticated?
     :header-params [authorization :- s/Str]
 
-    (GET "/thoughts/:id" []
-      :summary "Gets a thought"
+    (GET "/messages/:id" []
+      :summary "Gets a message"
       :path-params [id :- s/Uuid]
-      :return Thought
+      :return Message
       :auth-data auth-data
-      (memory/get-thought (:username auth-data) id))
+      (message/get-message (:username auth-data) id))
 
-    (POST "/thoughts" []
-      :summary "Creates a new thought"
-      :return Thought
-      :body-params [thought :- s/Str
+    (POST "/messages" []
+      :summary "Creates a new message"
+      :return Message
+      :body-params [message :- s/Str
                     {follow-id :- (s/maybe s/Uuid) nil}]
       :auth-data auth-data
-      (memory/save-thought (:username auth-data) thought follow-id))))
+      (message/save-message (:username auth-data) message follow-id))))
