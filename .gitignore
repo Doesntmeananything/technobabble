@@ -1,6 +1,7 @@
 /target
 *.iml
 .idea
+.eastwood
 /classes
 /checkouts
 pom.xml
