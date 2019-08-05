@@ -1,36 +1,33 @@
 version: 2
 jobs:
   build:
-    working_directory: ~/technobabble
     docker:
-      - image: openjdk:8
       - image: circleci/clojure:lein-2.7.1
-      - image: postgres:9.4.1
-        # The official Postgres docker images will create your DB for you
-        # if you set the POSTGRES_DB environment variable.
-        environment:
+      - image: circleci/postgres:9.4
+      environment:
           POSTGRES_USER: root
           POSTGRES_DB: technobabble
+    working_directory: ~/repo
     environment:
-      DATABASE_URL=postgres://localhost/technobabble
-      LEIN_ROOT: nbd
+      LEIN_ROOT: "true"
       JVM_OPTS: -Xmx3200m
+      DATABASE_URL=postgres://localhost/technobabble
     steps:
       - checkout
-      # Pull the dependencies in a way that they're cached.
+      # Download and cache dependencies
       - restore_cache:
-          key: << checksum "project.clj" >>
+          keys:
+          - v1-dependencies-{{ checksum "project.clj" }}
+          # fallback to using the latest cache if no exact match is found
+          - v1-dependencies-
       - run: lein deps
       - save_cache:
           paths:
-            - $HOME/.m2
-            - $HOME/.lein
-          key: << checksum "project.clj" >>
-      # Linting
-      - run: lein eastwood "{:namespaces [:source-paths]}"
+            - ~/.m2
+          key: v1-dependencies-{{ checksum "project.clj" }}
       # Formatting
       - run: lein cljfmt fix
-      # Migrate the DB, then test.
+      # Linting
+      - run: lein eastwood
+      # run tests
       # - run: lein test
-      # Push it out to Heroku on a successful master build.
-      # - run: git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$HEROKU_APP_NAME.git master
