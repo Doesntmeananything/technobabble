@@ -1,10 +1,10 @@
-(ns numergent.test.utils
+(ns mylib.test.utils
   #?(:clj
-     (:require [numergent.utils :refer :all]
+     (:require [mylib.utils :refer :all]
                [technobabble.misc.html :refer :all]
                [clojure.test :refer :all])
      :cljs
-     (:require [numergent.utils :refer [in-seq?]]
+     (:require [mylib.utils :refer [in-seq?]]
                [cljs.test :refer-macros [deftest is]])))
 
 (deftest test-in-seq
@@ -33,11 +33,3 @@
   (is (= "a < b" (remove-html "a < b")))
   (is (= "a < b or else" (remove-html "a < b<script>injected!</script> or else")))
   (is (= "a < b nice try" (remove-html "a < b <a onclick='alert()'>nice try</a>"))))
-
-(deftest test-clean-memory-text
-  ;; Memory text is cleared up
-  (is (= {:thought "Hello\n world\n\n**some bold**"} (clean-memory-text {:thought "Hello\n<h1>world</h1>\n\n**some bold**"})))
-  ;; Id is retained
-  (is (= {:thought "Hello\n world\n\n**some bold**" :id 1} (clean-memory-text {:thought "Hello\n<h1>world</h1>\n\n**some bold**" :id 1})))
-  ;; Other values are preserved
-  (is (= {:thought "a < b nice try" :id 1 :ignored true} (clean-memory-text {:thought "a < b <a onclick='alert()'>nice try</a>" :id 1 :ignored true}))))

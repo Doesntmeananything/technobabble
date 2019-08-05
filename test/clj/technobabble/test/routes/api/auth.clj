@@ -7,7 +7,7 @@
             [technobabble.test.db.core :as tdb]
             [technobabble.test.routes.helpers :refer [post-request patch-request get-request put-request del-request invoke-login]]
             [technobabble.db.core :refer [*db*]]
-            [numergent.auth :refer [create-auth-token decode-token]] ; Only for validation, all other calls should go through the API
+            [mylib.auth :refer [create-auth-token decode-token]] ; Only for validation, all other calls should go through the API
             [mount.core :as mount]))
 
 (use-fixtures

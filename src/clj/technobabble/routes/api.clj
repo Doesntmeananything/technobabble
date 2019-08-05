@@ -88,7 +88,7 @@
       :summary "Gets latest messages"
       :return Message
       :auth-data auth-data
-      (message/get-messages (:username auth-data)))
+      (message/get-messages))
 
     (POST "/messages" []
       :summary "Creates a new message"

@@ -6,7 +6,7 @@
             [technobabble.db.user :as user]
             [mount.core :as mount]
             [technobabble.db.core :refer [*db*] :as db]
-            [numergent.auth :as auth]
+            [mylib.auth :as auth]
             [clojure.java.io :as io])
   (:import (org.bouncycastle.jcajce.provider.asymmetric.rsa BCRSAPrivateCrtKey)))
 

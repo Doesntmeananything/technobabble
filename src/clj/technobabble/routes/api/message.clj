@@ -7,12 +7,11 @@
 
 (defn save-message
   "Saves a new message"
-  [username message refine-id]
+  [username message]
   (let [trimmed (string/trim message)]
     (if (not-empty trimmed)
       (let [record (message/create! {:username  username
-                                     :message   trimmed
-                                     :follow-id refine-id})]
+                                     :message   trimmed})]
         (created (str "/api/messages/" (:id record))
                  record))
       (bad-request! "Cannot add empty messages"))))
