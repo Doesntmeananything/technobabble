@@ -1,6 +1,7 @@
 (ns technobabble.db.core
   (:require
    [clojure.java.jdbc :as jdbc]
+   [clojure.string :as s]
    [conman.core :as conman]
    [cheshire.core :refer [generate-string parse-string]]
    [to-jdbc-uri.core :refer [to-jdbc-uri]]
@@ -61,7 +62,7 @@
     (let [conn      (.getConnection stmt)
           meta      (.getParameterMetaData stmt)
           type-name (.getParameterTypeName meta idx)]
-      (if-let [elem-type (when (= (first type-name) \_) (clojure.string/join (rest type-name)))]
+      (if-let [elem-type (when (= (first type-name) \_) (s/join (rest type-name)))]
         (.setObject stmt idx (.createArrayOf conn elem-type (to-array v)))
         (.setObject stmt idx (to-pg-json v))))))
 
