@@ -1,18 +1,13 @@
 (ns technobabble.core
   (:require [bidi.bidi :as bidi]
             [chord.client :refer [ws-ch]]
-            [clojure.string :refer [trim split]]
             [cljsjs.react-bootstrap]
             [cljs.core.async :as async :include-macros true]
             [jayq.core :refer [$]]
-            [markdown.core :refer [md->html]]
-            [technobabble.handlers.auth :refer [clear-token-on-unauth]]
             [technobabble.handlers.cache]
-            [technobabble.handlers.cluster]
             [technobabble.handlers.memory]
             [technobabble.handlers.routing :as r]
             [technobabble.handlers.ui-state]
-            [technobabble.handlers.thread]
             [technobabble.helpers :as helpers :refer [<sub]]
             [technobabble.ws-chat :as ws-chat]
             [pushy.core :as pushy]
@@ -26,9 +21,7 @@
   (:require-macros [reagent.ratom :refer [reaction]]
                    [technobabble.misc.cljs-macros :refer [adapt-bootstrap]]))
 
-;;;;------------------------------
 ;;;; Data and helpers
-;;;;------------------------------
 
 (adapt-bootstrap Button)
 (adapt-bootstrap ButtonGroup)
@@ -48,16 +41,7 @@
 (def ModalBody (reagent/adapt-react-class js/ReactBootstrap.ModalBody))
 (def ModalFooter (reagent/adapt-react-class js/ReactBootstrap.ModalFooter))
 
-(defn find-dom-elem
-  "Find a dom element by its id. Expects a keyword."
-  [id]
-  (first ($ id)))
-
-(def top-div-target (find-dom-elem :#header))
-
-;;;;------------------------------
 ;;;; Queries
-;;;;------------------------------
 
 (defn general-query
   [db [sid element-id]]
@@ -69,9 +53,7 @@
 (reg-sub :search-state general-query)
 (reg-sub :credentials general-query)
 
-;;;;------------------------------
 ;;;; Handlers
-;;;;------------------------------
 
 (reg-event-db
  :initialize
@@ -89,10 +71,7 @@
                      :cache    {}                          ; Will be used for caching threads and reminders
                      :note     {:edit-memory nil}})))
 
-;;;;------------------------------
 ;;;; Components
-;;;;------------------------------
-
 
 (def initial-focus-wrapper
   (with-meta identity
@@ -126,7 +105,7 @@
     (if (nil? (<sub [:credentials :token]))
       [Nav
        [navbar-item "Login" :login]
-       [navbar-item "Sign up" :signup]]
+       [navbar-item "Sign Up" :signup]]
       [Nav
        [navbar-item "Chat" :chat]
        [NavItem {:href "/" :class "nav-link" :on-click #(cookies/clear!)} "Logout"]])]])
@@ -140,7 +119,6 @@
 
 (defn thought-edit-box [note-id]
   [:div {:class "form-group"}
-   [focused-thought]
    [:div {:class "col-sm-12"}
     [initial-focus-wrapper
      [:textarea {:class       "form-control"
@@ -161,39 +139,6 @@
   (when (= 13 (.-which e))
     (dispatch d)))
 
-(defn memory-query []
-  (let [archived? (<sub [:ui-state :query-all?])
-        tooltip   (reagent/as-element [Tooltip {:id :archived?} "Include archived thoughts"])]
-    [:div {:class "form-horizontal"}
-     [:div {:class "form-group"}
-      [:label {:for "input-search" :class "col-md-1 control-label"} "Search:"]
-      [:div {:class "col-md-9"}
-       [initial-focus-wrapper
-        [:input {:type      "text"
-                 :class     "form-control"
-                 :id        "input-search"
-                 :value     (<sub [:ui-state :current-query])
-                 :on-change #(dispatch-sync [:state-current-query (-> % .-target .-value)])}]]]
-      [:div {:class "col-md-2"}
-       [OverlayTrigger
-        {:placement :left
-         :overlay   tooltip}
-        [:div {:class "checkbox"}
-         [:label
-          [:input {:type     "checkbox"
-                   :checked  archived?
-                   :on-click #(dispatch-sync [:state-query-all? (not archived?)])}]
-          [:i {:class "fa icon-margin-both fa-archive fa-lg fa-6x"}]]]]]]]))
-
-(defn memory-load-trigger []
-  (let [total-pages (reaction (:pages (<sub [:search-state :last-result])))]
-    (when (< (<sub [:search-state :page-index])
-             (dec @total-pages))
-      [:div {:style {:text-align "center"}}
-       (if (<sub [:ui-state :is-searching?])
-         [:i {:class "fa fa-spinner fa-spin"}]
-         [:i {:class "fa fa-ellipsis-h" :id "load-trigger"}])])))
-
 (defn login-form []
   (let [username  (<sub [:credentials :username])
         password  (<sub [:credentials :password])
@@ -208,7 +153,7 @@
      [:div {:class "modal-dialog"}
       [:div {:class "modal-content"}
        [:div {:class "modal-header"}
-        [:h4 {:class "modal-title"} "Login"]]
+        [:h4 {:class "modal-title"} (if (= :signup section) "Sign Up" "Login")]]
        [:div {:class "modal-body"}
         (when message
           [:div {:class (str "col-lg-12 alert " (:type message))}
@@ -252,28 +197,15 @@
                (not= :login @section)
                (not= :signup @section))
       (dispatch-sync [:state-ui-section :login]))
-    ;; Only renders the section, any dispatch should have happened on the :state-ui-section handler
     (case @section
       :chat [ws-chat/app-container]
-      :remember [memory-list]
       [login-form])))
 
-(defn header []
-  (let [state (subscribe [:ui-state :section])
-        label (case @state
-                :chat "Chat room"
-                :remember "Remember"
-                "")]
-    (if (not-empty label)
-      [:h1 {:id "forms"} label])))
-
-;;; -------------------------
 ;;; Initialize app
 
 (defn mount-components []
   (reagent/render-component [navbar] (.getElementById js/document "navbar"))
-  (reagent/render-component [content-section] (.getElementById js/document "content-section"))
-  (reagent/render-component [header] (.getElementById js/document "header")))
+  (reagent/render-component [content-section] (.getElementById js/document "content-section")))
 
 (defn init! []
   (timbre/set-level! :debug)

@@ -10,12 +10,9 @@
 ;;;; Routing
 ;;;;-------------------------
 
-(def routes ["/" {"record"   :chat
-                  "remember" :remember
-                  "regard"   :regard
+(def routes ["/" {"chat"   :chat
                   "signup"   :signup
                   "login"    :login
-                  "thread/"  {[:id] #(dispatch [:thread-display (:id %)])}
                   ""         :chat}])
 
 (defn set-page!

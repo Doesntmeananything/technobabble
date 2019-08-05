@@ -97,11 +97,7 @@
                   :class "login-input"
                   :value @v
                   :placeholder "Username"
-                  :on-change #(reset! v (-> % .-target .-value))}]
-         [:span {:class "bottom"}]
-         [:span {:class "right"}]
-         [:span {:class "top"}]
-         [:span {:class "left"}]]
+                  :on-change #(reset! v (-> % .-target .-value))}]]
         [:br]
         [:button {:type "submit"
                   :class "login-button"} "Start chatting!"]]])))

@@ -5,12 +5,7 @@
             [taoensso.timbre :as timbre]
             [reagent.cookies :as cookies]))
 
-
-
-;;;
 ;;; Functions
-;;;
-
 
 (defn clear-token-on-unauth
   "Receives an application state and an authorization result. If the status is 401, then it
@@ -19,11 +14,7 @@
   (if (= 401 (:status result))
     (dispatch [:auth-set-token nil])))
 
-
-;;;
 ;;; Handlers
-;;;
-
 
 (reg-event-db
  :auth-request
@@ -67,7 +58,7 @@
    (timbre/info "Auth error" (str result))
    (let [status    (:status result)
          is-unauth (or (= 401 status) (= 409 status))
-         message   (if is-unauth "Invalid username/password" (:status-text result))
+         message   (if is-unauth "Invalid username or password" (:status-text result))
          msg-type  (if is-unauth "alert-danger" "alert-warning")]
      (-> app-state
          (assoc-in [:ui-state :wip-login?] false)

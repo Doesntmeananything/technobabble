@@ -3,14 +3,9 @@
             [technobabble.handlers.auth :refer [clear-token-on-unauth]]
             [re-frame.core :refer [dispatch reg-sub reg-event-db subscribe dispatch-sync]]
             [taoensso.timbre :as timbre]
-            [technobabble.handlers.thread :as thread]
             [technobabble.helpers :as helpers]))
 
-
-;;;
 ;;; Handlers
-;;;
-
 
 (reg-event-db
  :memory-archive
@@ -21,16 +16,6 @@
                :handler       #(dispatch [:memory-archive-success memory])
                :error-handler #(dispatch [:state-error "Error changing archive state" %])}))
    (assoc-in app-state [:ui-state :is-busy?] true)))
-
-(reg-event-db
- :memory-archive-success
- (fn [app-state [_ memory]]
-   (let [thread-id (:root-id memory)]
-     (thread/reload-if-cached app-state thread-id)
-     (dispatch [:memories-load])
-     (-> app-state
-         (assoc-in [:ui-state :is-busy?] false)
-         (assoc :search-state nil)))))
 
 (reg-event-db
  :memories-load
@@ -94,20 +79,6 @@
    (assoc-in app-state [:ui-state :is-busy?] true)))
 
 (reg-event-db
- :memory-edit-save-success
- (fn [app-state [_ memory msg]]
-   (let [thread-id (:root-id memory)]
-     (dispatch [:state-message (str "Updated memory to: " msg) "alert-success"])
-     (dispatch [:memories-load])
-     (thread/reload-if-cached app-state thread-id)
-     (-> app-state
-         (assoc-in [:ui-state :is-busy?] false)
-         (assoc-in [:note :edit-memory] nil)
-         (assoc-in [:note :edit-note] "")
-         (assoc-in [:note :focus] nil)
-         (assoc :search-state nil)))))
-
-(reg-event-db
  :memory-forget
  (fn [app-state [_ memory]]
    (let [url (str "/api/thoughts/" (:id memory))]
@@ -115,16 +86,6 @@
                   :handler       #(dispatch [:memory-forget-success memory %])
                   :error-handler #(dispatch [:state-error "Error forgetting thought" %])}))
    app-state))
-
-(reg-event-db
- :memory-forget-success
- (fn [app-state [_ memory msg]]
-   (dispatch [:state-message (str "Thought forgotten") "alert-success"])
-   (thread/reload-if-cached app-state (:root-id memory))
-   (dispatch [:memories-load])
-   (-> app-state
-       (assoc-in [:ui-state :is-busy?] false)
-       (assoc :search-state nil))))
 
 (reg-event-db
  :memory-save
@@ -135,17 +96,3 @@
                             :handler       #(dispatch [:memory-save-success % note])
                             :error-handler #(dispatch [:state-error "Error saving thought" %])}))
    (assoc-in app-state [:ui-state :is-busy?] true)))
-
-(reg-event-db
- :memory-save-success
- (fn [app-state [_ result msg]]
-   (dispatch [:state-message (str "Saved: " msg) "alert-success"])
-   (dispatch [:reminder-create result "spaced"])
-   (thread/reload-if-cached app-state (:root-id result))
-   (-> app-state
-       (assoc-in [:ui-state :is-busy?] false)
-       (assoc-in [:note :current-note] "")
-       (assoc-in [:ui-state :show-thread-id] nil)
-       (assoc-in [:ui-state :show-thread?] false)
-       (assoc-in [:note :focus] nil)
-       (assoc :search-state nil))))
