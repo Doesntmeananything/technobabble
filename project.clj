@@ -38,7 +38,6 @@
                  [reagent-utils "0.3.1"]                    ; Used for reagent.cookies
                  [ring/ring-defaults "0.3.1"]               ; Used for anti-forgery
                  [ring-webjars "0.2.0"]
-                 [ring/ring-defaults "0.3.1"]
                  [selmer "1.11.7"]]
 
   :min-lein-version "2.0.0"
