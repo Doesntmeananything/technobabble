@@ -39,10 +39,9 @@
 (def ModalBody (reagent/adapt-react-class js/ReactBootstrap.ModalBody))
 (def ModalFooter (reagent/adapt-react-class js/ReactBootstrap.ModalFooter))
 
-(defn clear-cookies-and-reload
+(defn logout
   []
-  (.reload js/window.location true)
-  (cookies/clear!))
+  (dispatch [:auth-set-token nil]))
 
 ;;;; Queries
 
@@ -101,7 +100,7 @@
        [navbar-item "Sign Up" :signup]]
       [Nav
        [navbar-item "Chat" :chat]
-       [NavItem {:href "/" :class "nav-link" :on-click #(clear-cookies-and-reload)} "Logout"]])]])
+       [NavItem {:href "/" :class "nav-link" :on-click #(logout)} "Logout"]])]])
 
 (defn alert []
   (let [msg (<sub [:ui-state :last-message])]
@@ -109,12 +108,6 @@
       [:div {:class (str "alert " (:class msg))}
        [:button {:type :button :class "close" :on-click #(dispatch [:state-message ""])} "x"]
        (:text msg)])))
-
-(defn panel [title msg class]
-  [:div {:class (str "panel " class)}
-   [:div {:class "panel-heading"}
-    [:h3 {:class "panel-title"} title]]
-   [:div {:class "panel-body"} msg]])
 
 (defn dispatch-on-press-enter [e d]
   (when (= 13 (.-which e))
