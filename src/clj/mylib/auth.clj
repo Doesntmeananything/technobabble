@@ -45,7 +45,6 @@
   (s/validate AuthConf auth-conf)
   (try
     (jwt/unsign token (pubkey auth-conf) {:alg :rs256})
-    ;; We don't really care why decoding failed for now
     (catch ExceptionInfo e
       (timbre/trace e "Token decode error")
       nil)))
