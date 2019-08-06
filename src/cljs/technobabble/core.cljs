@@ -1,7 +1,6 @@
 (ns technobabble.core
   (:require [bidi.bidi :as bidi]
             [cljsjs.react-bootstrap]
-            [cljs.core.async :as async :include-macros true]
             [technobabble.handlers.cache]
             [technobabble.handlers.message]
             [technobabble.handlers.routing :as r]
@@ -10,12 +9,10 @@
             [technobabble.ws-chat :as ws-chat]
             [pushy.core :as pushy]
             [reagent.cookies :as cookies]
-            [reagent.core :as reagent :refer [atom]]
+            [reagent.core :as reagent]
             [re-frame.core :refer [dispatch reg-sub reg-event-db subscribe dispatch-sync]]
             [taoensso.timbre :as timbre
-             :refer-macros [log trace debug info warn error fatal report
-                            logf tracef debugf infof warnf errorf fatalf reportf
-                            spy get-env]])
+             :refer-macros [debug]])
   (:require-macros [reagent.ratom :refer [reaction]]
                    [technobabble.misc.cljs-macros :refer [adapt-bootstrap]]))
 
@@ -41,6 +38,7 @@
 
 (defn logout
   []
+  (.reload js/window.location true)
   (dispatch [:auth-set-token nil]))
 
 ;;;; Queries
@@ -60,7 +58,7 @@
  (fn [app-state _]
    (merge app-state {:ui-state {:wip-login?      false
                                 :section         :chat}
-                     :cache    {}                          ; Will be used for caching messages
+                     :cache    {} ; Will be used for caching messages
                      })))
 
 ;;;; Components
