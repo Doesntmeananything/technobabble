@@ -1,9 +1,7 @@
 (ns technobabble.core
   (:require [bidi.bidi :as bidi]
-            [chord.client :refer [ws-ch]]
             [cljsjs.react-bootstrap]
             [cljs.core.async :as async :include-macros true]
-            [jayq.core :refer [$]]
             [technobabble.handlers.cache]
             [technobabble.handlers.message]
             [technobabble.handlers.routing :as r]
@@ -64,7 +62,7 @@
    (merge app-state {:ui-state {:wip-login?      false
                                 :section         :chat}
                      :cache    {}                          ; Will be used for caching messages
-                     :note     {:edit-message nil}})))
+                     })))
 
 ;;;; Components
 
