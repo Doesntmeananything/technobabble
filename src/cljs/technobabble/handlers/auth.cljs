@@ -1,5 +1,5 @@
 (ns technobabble.handlers.auth
-  (:require [ajax.core :refer [GET POST PUT]]
+  (:require [ajax.core :refer [GET POST]]
             [technobabble.handlers.routing :as r]
             [re-frame.core :refer [dispatch reg-sub reg-event-db reg-event-fx subscribe dispatch-sync]]
             [taoensso.timbre :as timbre]
@@ -21,8 +21,6 @@
  (fn [app-state [_ signup?]]
    (let [url     (if signup? "signup" "login")
          to-send (if signup? [:username :password :password2] [:username :password])
-          ;; Should probably centralize password validation, so we can use the same function
-          ;; both here and when the UI is being updated
          valid?  (or (not signup?)
                      (= (get-in app-state [:credentials :password])
                         (get-in app-state [:credentials :password2])))]

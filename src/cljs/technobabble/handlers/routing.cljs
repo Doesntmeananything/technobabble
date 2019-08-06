@@ -6,12 +6,9 @@
                                    subscribe dispatch-sync]]
             [taoensso.timbre :as timbre]))
 
-;;;;-------------------------
 ;;;; Routing
-;;;;-------------------------
 
-(def routes ["/" {"chat"   :chat
-                  "signup"   :signup
+(def routes ["/" {"signup"   :signup
                   "login"    :login
                   ""         :chat}])
 
@@ -43,10 +40,6 @@
   (pushy/set-token! history url)
   (set-page! (bidi-matcher url)))
 
-;; Handler for changing the browser token from a keyword, so that
-;; :chat leads to /record. The handler is expected to apply any
-;; necessary changes to the ui state, or dispatch the relevant
-;; events.
 (reg-event-fx
  :state-browser-token
  (fn [_ [_ token-key]]

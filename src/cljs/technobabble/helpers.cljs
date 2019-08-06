@@ -52,12 +52,7 @@
    transformers/br
    mdcommon/thaw-strings])
 
-
-
-;;;;-------------------------
 ;;;; Helpers
-;;;;-------------------------
-
 
 (defn add-html
   "Receives a single thought and adds a :html element to it by

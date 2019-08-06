@@ -5,7 +5,7 @@
             [cljs.core.async :as async :include-macros true]
             [jayq.core :refer [$]]
             [technobabble.handlers.cache]
-            [technobabble.handlers.memory]
+            [technobabble.handlers.message]
             [technobabble.handlers.routing :as r]
             [technobabble.handlers.ui-state]
             [technobabble.helpers :as helpers :refer [<sub]]
@@ -41,16 +41,19 @@
 (def ModalBody (reagent/adapt-react-class js/ReactBootstrap.ModalBody))
 (def ModalFooter (reagent/adapt-react-class js/ReactBootstrap.ModalFooter))
 
+(defn clear-cookies-and-reload
+  []
+  (.reload js/window.location true)
+  (cookies/clear!))
+
 ;;;; Queries
 
 (defn general-query
   [db [sid element-id]]
   (get-in db [sid element-id]))
 
-(reg-sub :note general-query)
 (reg-sub :cache general-query)
 (reg-sub :ui-state general-query)
-(reg-sub :search-state general-query)
 (reg-sub :credentials general-query)
 
 ;;;; Handlers
@@ -58,18 +61,10 @@
 (reg-event-db
  :initialize
  (fn [app-state _]
-   (merge app-state {:ui-state {:is-busy?        false
-                                :wip-login?      false
-                                :show-thread?    false
-                                :section         :chat
-                                :current-query   ""
-                                :query-all?      false
-                                :results-page    0
-                                :memories        {:pages 0}
-                                :show-reminders? false
-                                :is-searching?   false}
-                     :cache    {}                          ; Will be used for caching threads and reminders
-                     :note     {:edit-memory nil}})))
+   (merge app-state {:ui-state {:wip-login?      false
+                                :section         :chat}
+                     :cache    {}                          ; Will be used for caching messages
+                     :note     {:edit-message nil}})))
 
 ;;;; Components
 
@@ -108,7 +103,7 @@
        [navbar-item "Sign Up" :signup]]
       [Nav
        [navbar-item "Chat" :chat]
-       [NavItem {:href "/" :class "nav-link" :on-click #(cookies/clear!)} "Logout"]])]])
+       [NavItem {:href "/" :class "nav-link" :on-click #(clear-cookies-and-reload)} "Logout"]])]])
 
 (defn alert []
   (let [msg (<sub [:ui-state :last-message])]
@@ -116,18 +111,6 @@
       [:div {:class (str "alert " (:class msg))}
        [:button {:type :button :class "close" :on-click #(dispatch [:state-message ""])} "x"]
        (:text msg)])))
-
-(defn thought-edit-box [note-id]
-  [:div {:class "form-group"}
-   [:div {:class "col-sm-12"}
-    [initial-focus-wrapper
-     [:textarea {:class       "form-control"
-                 :id          "thought-area"
-                 :placeholder "I was thinking..."
-                 :rows        12
-                 :style       {:font-size "18px"}
-                 :on-change   #(dispatch-sync [:state-note note-id (-> % .-target .-value)])
-                 :value       (<sub [:note note-id])}]]]])
 
 (defn panel [title msg class]
   [:div {:class (str "panel " class)}

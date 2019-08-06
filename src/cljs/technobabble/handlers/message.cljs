@@ -1,4 +1,4 @@
-(ns technobabble.handlers.memory
+(ns technobabble.handlers.message
   (:require [ajax.core :refer [GET POST PUT PATCH DELETE]]
             [technobabble.handlers.auth :refer [clear-token-on-unauth]]
             [re-frame.core :refer [dispatch reg-sub reg-event-db subscribe dispatch-sync]]
@@ -8,12 +8,12 @@
 ;;; Handlers
 
 (reg-event-db
- :memory-archive
- (fn [app-state [_ memory archived?]]
-   (let [url (str "/api/thoughts/" (:id memory) "/archive")]
+ :message-archive
+ (fn [app-state [_ message archived?]]
+   (let [url (str "/api/thoughts/" (:id message) "/archive")]
      (PUT url {:params        {:archived? archived?}
                :headers       {:authorization (str "Token " (get-in app-state [:credentials :token]))}
-               :handler       #(dispatch [:memory-archive-success memory])
+               :handler       #(dispatch [:message-archive-success message])
                :error-handler #(dispatch [:state-error "Error changing archive state" %])}))
    (assoc-in app-state [:ui-state :is-busy?] true)))
 
@@ -60,39 +60,39 @@
        (assoc-in [:ui-state :is-searching?] false))))
 
 (reg-event-db
- :memory-edit-set
+ :message-edit-set
  (fn [app-state [_ thought]]
    (if (empty? thought)
      (dispatch [:state-note :edit-note nil]))
-   (assoc-in app-state [:note :edit-memory] thought)))
+   (assoc-in app-state [:note :edit-message] thought)))
 
 (reg-event-db
- :memory-edit-save
+ :message-edit-save
  (fn [app-state _]
    (let [note   (get-in app-state [:note :edit-note])
-         memory (get-in app-state [:note :edit-memory])
-         url    (str "/api/thoughts/" (:id memory))]
+         message (get-in app-state [:note :edit-message])
+         url    (str "/api/thoughts/" (:id message))]
      (PATCH url {:params        {:thought note}
                  :headers       {:authorization (str "Token " (get-in app-state [:credentials :token]))}
-                 :handler       #(dispatch [:memory-edit-save-success memory note])
-                 :error-handler #(dispatch [:state-error "Error editing memory" %])}))
+                 :handler       #(dispatch [:message-edit-save-success message note])
+                 :error-handler #(dispatch [:state-error "Error editing message" %])}))
    (assoc-in app-state [:ui-state :is-busy?] true)))
 
 (reg-event-db
- :memory-forget
- (fn [app-state [_ memory]]
-   (let [url (str "/api/thoughts/" (:id memory))]
+ :message-forget
+ (fn [app-state [_ message]]
+   (let [url (str "/api/thoughts/" (:id message))]
      (DELETE url {:headers       {:authorization (str "Token " (get-in app-state [:credentials :token]))}
-                  :handler       #(dispatch [:memory-forget-success memory %])
+                  :handler       #(dispatch [:message-forget-success message %])
                   :error-handler #(dispatch [:state-error "Error forgetting thought" %])}))
    app-state))
 
 (reg-event-db
- :memory-save
+ :message-save
  (fn [app-state _]
    (let [note (get-in app-state [:note :current-note])]
      (POST "/api/thoughts" {:params        {:thought note :follow-id (get-in app-state [:note :focus :id])}
                             :headers       {:authorization (str "Token " (get-in app-state [:credentials :token]))}
-                            :handler       #(dispatch [:memory-save-success % note])
+                            :handler       #(dispatch [:message-save-success % note])
                             :error-handler #(dispatch [:state-error "Error saving thought" %])}))
    (assoc-in app-state [:ui-state :is-busy?] true)))
