@@ -93,6 +93,7 @@
                                     {:source-paths ["env/prod/cljs"]
                                      :compiler     {:optimizations    :advanced
                                                     :pretty-print     false
+                                                    :closure-defines {technobabble.ws-chat/ws-url "wss://technobabble-app.herokuapp.com/ws"
                                                     :closure-warnings {:externs-validation :off
                                                                        :non-standard-jsdoc :off}}}}}}
 
