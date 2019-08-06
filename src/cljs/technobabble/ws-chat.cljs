@@ -6,7 +6,7 @@
    [reagent.core :as reagent :refer [atom]]
    [re-frame.core :refer [dispatch reg-sub reg-event-db subscribe dispatch-sync]]))
 
-; (goog-define ws-url "ws://localhost:3449/ws")
+(goog-define ws-url "wss://localhost:3449/ws")
 
 (defonce app-state (atom {:text "Default text"
                           :active-panel :login
@@ -43,7 +43,7 @@
 
 (defn setup-websockets! []
   (async/go
-    (let [{:keys [ws-channel error]} (async/<! (ws-ch (str "ws://" (.-host js/location) "/ws")))]
+    (let [{:keys [ws-channel error]} (async/<! (ws-ch ws-url))]
       (if error
         (println "Something went wrong with the websocket")
         (do
