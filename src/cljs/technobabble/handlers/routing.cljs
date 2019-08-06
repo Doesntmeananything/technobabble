@@ -6,8 +6,6 @@
                                    subscribe dispatch-sync]]
             [taoensso.timbre :as timbre]))
 
-;;;; Routing
-
 (def routes ["/" {"signup"   :signup
                   "login"    :login
                   ""         :chat}])

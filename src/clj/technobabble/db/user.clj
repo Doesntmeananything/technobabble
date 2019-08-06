@@ -1,15 +1,11 @@
 (ns technobabble.db.user
   (:require [clojure.string :refer [lower-case]]
-            [technobabble.config :refer [env]]
             [buddy.hashers :as hashers]
             [technobabble.db.core :refer [*db*] :as db]))
 
 (defn create!
   "Saves a new username, hashing the password as it does so"
   [^String username ^String password]
-  ;; We could use bouncer for validation here if we get the params as a map
-  ;; or just convert them ourselves for validation
-  ;; Another option for these assertions is Truss, I guess.
   (cond
     (empty? password) {:success? false :message "A non-empty password is required"}
     (empty? username) {:success? false :message "A non-empty username is required"}

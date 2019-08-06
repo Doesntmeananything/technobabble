@@ -5,6 +5,8 @@
             [taoensso.timbre :as timbre]
             [technobabble.helpers :as helpers]))
 
+; In theory messages would have this stateful logic
+
 ;;; Handlers
 
 (reg-event-db

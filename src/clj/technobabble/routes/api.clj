@@ -62,9 +62,6 @@
       :auth-rules authenticated?
       :auth-data auth-data
       :summary "Attempts to validate a token, and echoes it if valid"
-      ;; You'll notice I don't actually do any validation here. This is
-      ;; because the validation and the authentication verification are
-      ;; the same. If we got this far, the token is valid.
       (ok (:token auth-data)))
 
     (POST "/signup" []

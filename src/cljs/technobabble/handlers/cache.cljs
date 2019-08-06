@@ -3,10 +3,12 @@
             [re-frame.core :refer [dispatch reg-sub reg-event-db subscribe dispatch-sync]]
             [taoensso.timbre :as timbre]))
 
+; Trying to come up with some message caching solution here
+
 (reg-event-db
  :cache-add-message
  (fn [app-state [_ message]]
-    ;; Looks for the id associated with the message, and add it
+    ;; Looks for the id associated with the message and add it
    (let [fn-add-message (fn [e] (if (= (:message-id e) (:id message))
                                   (assoc e :message-record message)
                                   e))]

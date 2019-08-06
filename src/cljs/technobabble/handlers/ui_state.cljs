@@ -9,13 +9,15 @@
  (fn [app-state [_ k v]]
    (assoc-in app-state [:credentials k] v)))
 
+; Potential message handling
+
 (reg-event-db
  :state-ui-section
  (fn [app-state [_ section]]
    (timbre/trace :state-ui-section section)
    (condp = section
     ;  Dispatch event to fetch latest messages
-    ;  :chat (dispatch [:reminder-load])
+    ;  :chat (dispatch [:message-load])
      nil)
     ; Do not associate nil sections
    (if (some? section)
@@ -26,7 +28,6 @@
  :state-message
  (fn [app-state [_ msg class]]
    (let [message {:text msg :class class}]
-      ;; TODO: Consider changing this for a keyword
      (if (= class "alert-success")
        (js/setTimeout #(dispatch [:state-message-if-same message nil]) 3000))
      (assoc-in app-state [:ui-state :last-message] message))))

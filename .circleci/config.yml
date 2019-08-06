@@ -29,7 +29,7 @@ jobs:
       - run: lein cljfmt fix
       # Linting; implicit-dependencies is a bit wonky for one file
       - run: lein eastwood "{:exclude-linters [:implicit-dependencies]}"
-      # Database setup
+      # Database setup for integration tests
       # - run: |
       #   apt-get update -y
       #   apt-get install postgresql-client -y
@@ -37,5 +37,5 @@ jobs:
       #   echo $DATABASE_URL
       #   cp resources/test-config.default.edn ./test-config.edn
       #   lein with-profile test run migrate
-      # run tests
+      # run basic tests
       - run: lein test :only mylib.test.utils
