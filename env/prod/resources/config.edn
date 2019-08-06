@@ -1,3 +1,5 @@
 {:prod true
  :port       3000
- :auth-conf  {:pubkey "keys/prod_auth_pubkey.pem"}}
+ :auth-conf  {:pubkey "keys/prod_auth_pubkey.pem"
+              :passphrase ""
+              :privkey    ""}}
