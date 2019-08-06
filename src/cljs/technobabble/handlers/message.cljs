@@ -35,8 +35,7 @@
 
 (reg-event-db
  :memory-save-success
- (fn [app-state [_ result msg]]
+ (fn [app-state [_ msg]]
    (dispatch [:state-message (str "Saved: " msg) "alert-success"])
-   (thread/reload-if-cached app-state (:root-id result))
    (-> app-state
        (assoc-in [:messages :current-message] ""))))
