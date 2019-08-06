@@ -6,7 +6,7 @@
    [reagent.core :as reagent :refer [atom]]
    [re-frame.core :refer [dispatch reg-sub reg-event-db subscribe dispatch-sync]]))
 
-(goog-define ws-url "ws://localhost:3000/ws")
+(goog-define ws-url "ws://technobabble-app.herokuapp.com//ws")
 
 (defonce app-state (atom {:text "Default text"
                           :active-panel :login
